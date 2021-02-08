@@ -1,3 +1,4 @@
 msys
 mingw
 *.exe
+*.sig

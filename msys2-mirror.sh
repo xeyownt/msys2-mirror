@@ -92,11 +92,16 @@ download_setup()
     #     <a href="msys2-x86_64-20190524.exe">msys2-x86_64-20190524.exe</a>                          24-May-2019 11:56            90688487
     #     ...
     # OUTPUT: msys2-x86_64-20190524.exe 90688487
+    # echo wget -q $REPO/distrib/$ARCH/ -O -
     wget -q $REPO/distrib/$ARCH/ -O - | \
-        sed -rn '/href="msys2-x86_64-/{s/^.*href="(msys2-x86_64-[^"]*)".* ([0-9]+).*$/\1 \2/;p}' | \
+        sed -rn '/href="msys2-x86_64-.*exe"/{s/^.*href="(msys2-x86_64-[^"]*)".* ([0-9]+[MkKG]?).*$/\1 \2/;p}' | \
         sort | \
         tail -1 | \
     while read SETUP SIZE; do
+        [[ $SIZE =~ .*G ]] && SIZE=$((${SIZE%%G} * 1024 * 1024 * 1024))
+        [[ $SIZE =~ .*M ]] && SIZE=$((${SIZE%%M} * 1024 * 1024))
+        [[ $SIZE =~ .*K ]] && SIZE=$((${SIZE%%K} * 1024))
+        [[ $SIZE =~ .*k ]] && SIZE=$((${SIZE%%k} * 1024))
         wget_pv 0 0 $REPO/distrib/$ARCH/$SETUP $MIRROR $SIZE
     done
 }
